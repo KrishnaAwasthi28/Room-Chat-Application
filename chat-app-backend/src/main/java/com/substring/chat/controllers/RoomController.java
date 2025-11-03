@@ -50,14 +50,12 @@ public class RoomController {
 
     //get room: join
     @GetMapping("/{roomId}")
-    public ResponseEntity<?> joinRoom(
-            @PathVariable String roomId
-    ) {
-
+    public ResponseEntity<?> joinRoom(@PathVariable String roomId) {
+        System.out.println("Trying to fetch room with ID: " + roomId);
         Room room = roomRepository.findByRoomId(roomId);
+        System.out.println("Fetched room: " + room);
         if (room == null) {
-            return ResponseEntity.badRequest()
-                    .body("Room not found!!");
+            return ResponseEntity.badRequest().body("Room not found!!");
         }
         return ResponseEntity.ok(room);
     }
