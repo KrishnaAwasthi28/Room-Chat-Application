@@ -1,14 +1,25 @@
-# Use an OpenJDK base image
-FROM openjdk:26-slim-bookworm
-
-# Set working directory
+# Use official Maven image to build the app
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy jar file (replace target/*.jar with your actual jar name)
-COPY target/chat-app-backend-0.0.1-SNAPSHOT.jar app.jar
+# Copy project files
+COPY pom.xml .
+COPY src ./src
 
-# Expose the port your Spring Boot runs on
+# Build the project
+RUN mvn clean package -DskipTests
+
+# =========================
+# Second stage: run the app
+# =========================
+FROM openjdk:26-slim-bookworm
+WORKDIR /app
+
+# Copy built jar from previous stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose port
 EXPOSE 8080
 
-# Run the jar file
-ENTRYPOINT ["java","-jar","app.jar"]
+# Run the jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
